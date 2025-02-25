@@ -1,0 +1,20 @@
+### Listar Producto
+GET http://127.0.0.1:8000/api/producto?page=2&limit=10&q=
+Accept: application/json
+Authorization: Bearer 6|rcF39p0gj10UdC6jIwikjgFCl6BVlsxlQKVkYuBOa0d92ff4
+
+
+### guardar producto
+
+POST http://127.0.0.1:8000/api/producto
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer 1|WMGcTLDBhZiOLmay7fRIoi2bbCbrVTneiczqOOsHfc9c6cf4
+
+{
+    "nombre": "ROPERO",
+    "precio": 629.98,
+    "categoria_id": 2,
+    "stock": 8,
+    "descripcion": "ROPERO DE METAL"
+}

@@ -1,0 +1,148 @@
+<p-toolbar styleClass="mb-6">
+    <ng-template #start>
+        <p-button label="Nuevo Producto" icon="pi pi-plus" class="mr-2" (onClick)="openNew()" />
+    </ng-template>
+
+    <ng-template #end>
+       <p-button label="Exportar" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV($event)" />
+       <form (ngSubmit)="funBuscar()">
+           <input type="text" [(ngModel)]="buscar" >
+           
+           <button type="submit">BUSCAR</button>
+
+       </form>
+    </ng-template>
+</p-toolbar>
+
+<p-table
+    #dt
+    [value]="productos"
+    [rows]="5"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    [lazy] = "true"
+    [totalRecords]="totalRecords"
+    [loading]="loading"
+    (onLazyLoad)="cargarProductos($event)"
+    [columns] = "cols"
+    [paginator]="true"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} al {last} de {totalRecords} entradas"
+    [showCurrentPageReport]="true"
+>
+<ng-template #caption>
+    <div class="flex items-center justify-between">
+        <h5 class="m-0">Manage Products</h5>
+    
+    </div>
+</ng-template>
+<ng-template #header>
+    <tr>
+        <th style="width: 3rem">
+            <p-tableHeaderCheckbox />
+        </th>
+        <th style="min-width: 2rem">ID</th>
+        <th pSortableColumn="nombre" style="min-width:8rem">
+            NOMBRE
+            <p-sortIcon field="nombre" />
+        </th>
+        <th>IMAGEN</th>
+        <th pSortableColumn="precio" style="min-width: 8rem">
+            Precio
+            <p-sortIcon field="precio" />
+        </th>
+        <th pSortableColumn="categoria" style="min-width:10rem">
+            Categoria
+            <p-sortIcon field="categoria" />
+        </th>
+        <th pSortableColumn="inventoryStatus" style="min-width: 12rem">
+            STOCK
+            <p-sortIcon field="inventoryStatus" />
+        </th>
+        <th style="min-width: 12rem"></th>
+    </tr>
+</ng-template>
+<ng-template #body let-product>
+    <tr>
+        <td style="width: 3rem">
+            <p-tableCheckbox [value]="product" />
+        </td>
+        <td style="min-width: 2rem">{{ product.id }}</td>
+        <td style="min-width: 8rem">{{ product.nombre }}</td>
+        <td>
+            @if (product.imagen) {
+                <p-image [src]="'http://127.0.0.1:8000/' + product.imagen" [alt]="product.nombre" width="100" class="rounded" [preview]="true" />
+            }
+        </td>
+        <td>{{ product.precio | currency: 'USD' }}</td>
+        <td>{{ product.categoria.nombre }}</td>
+        <td>
+            {{ product.stock }}
+        </td>
+        <td>
+            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editProduct(product)" />
+            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteProduct(product)" />
+        </td>
+    </tr>
+</ng-template>
+<ng-template #summary>
+    <div class="flex items-center justify-between">En TOtal son {{ productos ? productos.length : 0 }} Productos.</div>
+</ng-template>
+</p-table>
+
+<p-dialog [(visible)]="productDialog" [style]="{ width: '450px' }" header="Detalle de Producto" [modal]="true">
+    <ng-template #content>
+        <!--{{ productoForm.value | json }}-->
+         {{ productoForm.valid }}
+        <div class="flex flex-col gap-6" [formGroup]="productoForm">
+            @if (imagen_actual) {
+                <img [src]="imagen_actual" [alt]="productoForm.value.nombre" class="block m-auto pb-4" width="300" />
+            }
+            <div>
+                <label for="name" class="block font-bold mb-3">Nombre</label>
+                <input type="text" pInputText id="name" formControlName="nombre" required autofocus fluid />
+                <small class="text-red-500" *ngIf="submitted && !productoForm.value.nombre">Nombre es Obligatorio.</small>
+                <small class="text-red-500" *ngIf="errors.nombre">{{errors.nombre}}</small>
+
+            </div>
+            <div>
+                <label for="description" class="block font-bold mb-3">Descripción</label>
+                <textarea id="description" pTextarea formControlName="descripcion" rows="3" cols="20" fluid></textarea>
+            </div>
+            <input type="file" (change)="funSeleccionarImagen($event)" *ngIf="!productoForm.value.id">
+
+            <div>
+                <span class="block font-bold mb-4">Categoria</span>
+                <div class="grid grid-cols-12 gap-4">
+                    @for (cat of categorias; track $index) {
+
+                        <div class="flex items-center gap-2 col-span-6">
+                            <p-radiobutton [id]="cat.id" name="categoria_id" [value]="cat.id" formControlName="categoria_id" />
+                            <label [for]="cat.id">{{cat.nombre}}</label>
+                        </div>
+                    }
+                </div>
+                <small class="text-red-500" *ngIf="errors.categoria_id">{{errors.categoria_id}}</small>
+
+            </div>
+
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-6">
+                    <label for="Precios" class="block font-bold mb-3">Precio</label>
+                    <p-inputnumber id="precio" formControlName="precio" mode="currency" currency="USD" locale="en-US" fluid />
+                </div>
+                <div class="col-span-6">
+                    <label for="cant" class="block font-bold mb-3">Stock</label>
+                    <p-inputnumber id="cant" formControlName="stock" fluid />
+                    <small class="text-red-500" *ngIf="errors.stock">{{errors.stock}}</small>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Registrar Cambios" icon="pi pi-check" (click)="saveProduct()" [disabled]="!productoForm.valid" />
+    </ng-template>
+</p-dialog>

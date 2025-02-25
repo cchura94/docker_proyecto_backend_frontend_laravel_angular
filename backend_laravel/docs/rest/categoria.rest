@@ -1,0 +1,36 @@
+### Listar Categoria
+GET http://127.0.0.1:8000/api/categoria
+Accept: application/json
+Authorization: Bearer 1|WMGcTLDBhZiOLmay7fRIoi2bbCbrVTneiczqOOsHfc9c6cf4
+
+### Crear Categoria
+POST http://127.0.0.1:8000/api/categoria
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer 1|WMGcTLDBhZiOLmay7fRIoi2bbCbrVTneiczqOOsHfc9c6cf4
+
+{
+    "nombre": "MUEBLES",
+    "detalle": "Muebles para oficina"
+}
+### Mostrar Categoria
+GET http://127.0.0.1:8000/api/categoria/2
+Accept: application/json
+
+### Actualizar Categoria
+PUT http://127.0.0.1:8000/api/categoria/1
+Accept: application/json
+Content-Type: application/json
+
+{
+    "nombre": "MUEBLES MODIFICADO",
+    "descripcion": "Descripcion de la categoria Muebles modificado"
+}
+
+### Eliminar Categoria
+DELETE http://127.0.0.1:8000/api/categoria/2
+Accept: application/json
+
+### categoria publica
+GET http://127.0.0.1:8000/api/categoria-publica
+Accept: application/json

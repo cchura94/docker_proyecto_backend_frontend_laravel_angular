@@ -1,0 +1,15 @@
+GET http://127.0.0.1:8000/api/cliente
+Authorization: bearer 6|rcF39p0gj10UdC6jIwikjgFCl6BVlsxlQKVkYuBOa0d92ff4
+
+### guardar Cliente
+POST http://127.0.0.1:8000/api/cliente
+Authorization: bearer 6|rcF39p0gj10UdC6jIwikjgFCl6BVlsxlQKVkYuBOa0d92ff4
+Accept: application/json
+Content-Type: application/json
+
+{
+    "nombre_completo": "JUAN PEREZ",
+    "correo": "juan@mail.com",
+    "ci": "9876543"
+    
+}

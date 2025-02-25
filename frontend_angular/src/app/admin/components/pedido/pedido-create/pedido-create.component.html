@@ -1,0 +1,166 @@
+<div class="container mx-auto p-6 space-y-8 bg-white rounded-lg shadow-lg">
+    <div class="grid grid-cols-3 gap-6">
+        <!-- Columna de Listado de Pedidos -->
+        <div class="col-span-2 bg-gray-100 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-semibold text-gray-800">Listado de Productos</h3>
+            
+            <p-toolbar styleClass="mb-6">
+            
+                <ng-template #end>
+                   <form (ngSubmit)="funBuscar()">
+                       <input type="text" [(ngModel)]="buscar" >
+                       
+                       <button type="submit">BUSCAR</button>
+            
+                   </form>
+                </ng-template>
+            </p-toolbar>
+            
+            <p-table
+                #dt
+                [value]="productos"
+                [rows]="5"
+                [rowsPerPageOptions]="[5, 10, 20]"
+                [lazy] = "true"
+                [totalRecords]="totalRecords"
+                [loading]="loading"
+                (onLazyLoad)="cargarProductos($event)"
+                [columns] = "cols"
+                [paginator]="true"
+                [tableStyle]="{ 'min-width': '12rem' }"
+                [rowHover]="true"
+                dataKey="id"
+                currentPageReportTemplate="Mostrando {first} al {last} de {totalRecords} entradas"
+                [showCurrentPageReport]="true"
+            >
+            <ng-template #caption>
+                <div class="flex items-center justify-between">
+                    <h5 class="m-0">Manage Products</h5>
+                
+                </div>
+            </ng-template>
+            <ng-template #header>
+                <tr>
+                    <th style="min-width: 2rem">ID</th>
+                    <th pSortableColumn="nombre" style="min-width:10rem">
+                        NOMBRE
+                        <p-sortIcon field="nombre" />
+                    </th>
+                    <th>IMAGEN</th>
+                    <th pSortableColumn="precio" style="min-width: 4rem">
+                        Precio
+                        <p-sortIcon field="precio" />
+                    </th>
+                    <th pSortableColumn="categoria" style="min-width:5rem">
+                        Categoria
+                        <p-sortIcon field="categoria" />
+                    </th>
+                    <th pSortableColumn="inventoryStatus" style="min-width: 3rem">
+                        STOCK
+                        <p-sortIcon field="inventoryStatus" />
+                    </th>
+                    <th style="min-width: 12rem"></th>
+                </tr>
+            </ng-template>
+            <ng-template #body let-product>
+                <tr>
+                    <td style="min-width: 2rem">{{ product.id }}</td>
+                    <td style="min-width: 10rem">{{ product.nombre }}</td>
+                    <td>
+                        @if (product.imagen) {
+                            <p-image [src]="'http://127.0.0.1:8000/' + product.imagen" [alt]="product.nombre" width="100" class="rounded" [preview]="true" />
+                        }
+                    </td>
+                    <td>{{ product.precio | currency: 'USD' }}</td>
+                    <td>{{ product.categoria.nombre }}</td>
+                    <td>
+                        {{ product.stock }}
+                    </td>
+                    <td>
+                        <p-button icon="pi pi-plus" class="mr-2" [rounded]="true" [outlined]="true" (click)="addCarrito(product)" />
+                    </td>
+                </tr>
+            </ng-template>
+            </p-table>
+            
+        </div>
+
+        <!-- Columna de Carrito de Productos -->
+        <div class="col-span-1 bg-gray-100 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-semibold text-gray-800">Carrito de Productos</h3>
+            <div class="space-y-4 mt-4">
+                <!-- Producto en el carrito -->
+                 @for (item of carrito; track $index) {
+                     <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
+                         <span class="text-gray-700">{{item.nombre}}</span>
+                         <div class="flex items-center space-x-4">
+                             <span class="text-gray-600">C: {{item.cantidad}}</span>
+                             <span class="text-gray-700 font-semibold">${{item.precio}}</span>
+                             <button class="text-red-500 hover:text-red-700">X</button>
+                         </div>
+                     </div>
+
+                 }
+            </div>
+
+            <!-- Columna de Selección de Cliente y Generar Pedido -->
+        <div class="col-span-3 bg-gray-100 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-semibold text-gray-800">Generar Pedido</h3>
+            <div class="space-y-6 mt-4">
+                <!-- Selección de Cliente -->
+                <div>
+                    <label for="cliente" class="block text-gray-700 font-semibold">Seleccionar Cliente</label>
+                    <p-button (click)="showDialogCliente()" label="NuevCliente" />
+    <p-dialog header="Nuevo Cliente" [modal]="true" [(visible)]="visibleCliente" [style]="{ width: '25rem' }">
+        <span class="p-text-secondary block mb-8">Ingrese Datos de Categoria.</span>
+        {{ clienteForm.value |json }}
+        <div [formGroup]="clienteForm">
+            <div class="flex items-center gap-4 mb-4">
+                <label for="nom" class="font-semibold w-24">Nombre</label>
+                <input pInputText id="nom" class="flex-auto" autocomplete="off" formControlName="nombre_completo" />
+            </div>
+            <div class="flex items-center gap-4 mb-8">
+                <label for="det" class="font-semibold w-24">Correo</label>
+                <input pInputText id="det" class="flex-auto" autocomplete="off" formControlName="correo" />
+            </div>
+            <div class="flex items-center gap-4 mb-8">
+                <label for="det" class="font-semibold w-24">Ci</label>
+                <input pInputText id="det" class="flex-auto" autocomplete="off" formControlName="ci" />
+            </div>
+            <div class="flex items-center gap-4 mb-8">
+                <label for="det" class="font-semibold w-24">Telefono</label>
+                <input pInputText id="det" class="flex-auto" autocomplete="off" formControlName="telefono" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <p-button label="Cancelar" severity="secondary" (click)="visibleCliente = false" />
+                <p-button label="Guardar Cliente" (click)="funGuardarCliente()" />
+            </div>
+
+        </div>
+    </p-dialog>
+
+    @if(cliente_seleccionado.id){
+        <div class="max-w-sm mx-auto bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Datos del Cliente</h3>
+            
+            <div class="space-y-2">
+                <p class="text-gray-700"><strong>Nombre:</strong> {{cliente_seleccionado.nombre_completo}}</p>
+                <p class="text-gray-700"><strong>Correo:</strong> {{cliente_seleccionado.correo}}</p>
+                <p class="text-gray-700"><strong>CI:</strong> {{cliente_seleccionado.ci}}</p>
+                <p class="text-gray-700"><strong>Teléfono:</strong> {{cliente_seleccionado.telefono}}</p>
+            </div>
+        </div>
+    }
+                </div>
+
+                <!-- Botón de Generar Pedido -->
+                <button class="w-full py-3 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700" (click)="funGuardarPedido()">
+                    Generar Pedido
+                </button>
+            </div>
+        </div>
+        </div>
+
+        
+    </div>
+</div>

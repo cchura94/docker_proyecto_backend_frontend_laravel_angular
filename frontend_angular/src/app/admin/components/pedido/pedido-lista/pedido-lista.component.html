@@ -1,0 +1,102 @@
+<button type="button" (click)="descargarPDF()" pButton icon="pi pi-pdf" label="DESCARGAR PDF"></button>
+
+<p-table [value]="pedidos" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template #header>
+        <tr>
+            <th>ID</th>
+            <th>FECHA</th>
+            <th>CLIENTE</th>
+            <th>ESTADO</th>
+            <th>DETALLE</th>
+            <th>ACCION</th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-pedido>
+        <tr>
+            <td>{{ pedido.id }}</td>
+            <td>{{ pedido.fecha }}</td>
+            <td>
+                <h1 class="text-xl font-medium">{{pedido.cliente?.nombre_completo}}</h1>
+                <small class="font-medium text-sky-500">{{pedido.cliente?.correo}}</small>
+            </td>
+            <td>{{ pedido.estado?'COMPLETADO':'PENDIENTE' }}</td>
+            <td>
+
+                <div class="flex justify-center">
+                    <button type="button" (click)="showDialog(pedido)" pButton icon="pi pi-external-link" label="Ver"></button>
+                </div>
+                
+
+            </td>
+            <td>
+                <button type="button" (click)="mostrarPedidoPDF(pedido.id)" pButton icon="pi pi-pdf" label="PDF"></button>
+
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog
+                    header="Detalle de Venta"
+                    [resizable]="false"
+                    [modal]="true"
+                    [maximizable]="true"
+                    appendTo="body"
+                    [(visible)]="dialogVisible"
+                    [style]="{ width: '75vw' }"
+                >
+                
+                <div class="container mx-auto p-6 bg-white rounded-lg shadow-lg">
+                    <!-- Información del Pedido -->
+                     @if (pedido.cliente) {
+
+                    
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-800">Recibo de Pedido</h2>
+                        <div class="grid grid-cols-2 gap-6 mt-4">
+                            <div>
+                                <p class="text-lg text-gray-700">ID de Pedido: <span class="font-bold">{{ pedido.id }}</span></p>
+                                <p class="text-lg text-gray-700">Fecha: <span class="font-bold">{{ pedido.fecha }}</span></p>
+                                <p class="text-lg text-gray-700">Estado: <span class="font-bold">{{ pedido.estado ? 'Activo' : 'Inactivo' }}</span></p>
+                                <p class="text-lg text-gray-700">Observación: <span class="font-bold">{{ pedido.observacion }}</span></p>
+                            </div>
+                            <div>
+                                <p class="text-lg text-gray-700">Cliente: <span class="font-bold">{{ pedido.cliente.nombre_completo }}</span></p>
+                                <p class="text-lg text-gray-700">Correo: <span class="font-bold">{{ pedido.cliente.correo }}</span></p>
+                                <p class="text-lg text-gray-700">CI: <span class="font-bold">{{ pedido.cliente.ci }}</span></p>
+                                <p class="text-lg text-gray-700">Teléfono: <span class="font-bold">{{ pedido.cliente.telefono || 'No disponible' }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Tabla de Productos -->
+                    <div class="overflow-x-auto">
+                        <p-table [value]="pedido.productos" [scrollable]="true" scrollHeight="flex" [tableStyle]="{ 'min-width': '50rem' }">
+                            <ng-template #header>
+                                <tr class="bg-gray-100 text-gray-700">
+                                    <th class="px-4 py-2">Producto</th>
+                                    <th class="px-4 py-2">Descripción</th>
+                                    <th class="px-4 py-2">Precio Unitario</th>
+                                    <th class="px-4 py-2">Cantidad</th>
+                                    <th class="px-4 py-2">Subtotal</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template #body let-producto>
+                                <tr>
+                                    <td class="px-4 py-2">{{ producto.nombre }}</td>
+                                    <td class="px-4 py-2">{{ producto.descripcion }}</td>
+                                    <td class="px-4 py-2 text-right">{{ producto.precio | currency }}</td>
+                                    <td class="px-4 py-2 text-right">{{ producto.pivot.cantidad }}</td>
+                                    <td class="px-4 py-2 text-right">{{ (producto.precio * producto.pivot.cantidad) | currency }}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                }
+                </div>
+
+                
+                    <ng-template #footer>
+                        <p-button label="Cerrar" icon="pi pi-check" (onClick)="dialogVisible = false" />
+                    </ng-template>
+                </p-dialog>

@@ -1,0 +1,94 @@
+<p>usuario works!</p>
+{{ usuarios }}
+
+<br>
+<hr>
+{{ usuarioForm.value | json }}
+
+<form [formGroup]="usuarioForm">
+
+    <label for="name">Ingrese Nombre</label>
+    <input type="text" formControlName="name">
+    <br>
+    <label for="e">Ingrese Correo</label>
+    <input type="email" formControlName="email">
+    <br>
+    <label for="p">Ingrese Contraseña</label>
+    <input type="password" formControlName="password">
+    <br>
+
+    <button type="button" (click)="funGuardarUsuario()">Guardar Usuario</button>
+</form>
+<div class="card">
+
+    <p-button (click)="mostrarDialog()" label="Nuevo Usuario" />
+    <p-dialog header="Edit Profile" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }" [formGroup]="usuarioForm">
+        <span class="p-text-secondary block mb-8">Update your information.</span>
+        <div class="flex items-center gap-4 mb-4">
+            <label for="username" class="font-semibold w-24">Nombre Usuario</label>
+            <input pInputText id="username" class="flex-auto" autocomplete="off" formControlName="name" />
+        </div>
+        <div class="flex items-center gap-4 mb-8">
+            <label for="email" class="font-semibold w-24">Correo</label>
+            <input pInputText id="email" class="flex-auto" autocomplete="off" formControlName="email" />
+        </div>
+
+        <div class="flex items-center gap-4 mb-8">
+            <label for="pass" class="font-semibold w-24">Contraseña</label>
+            <input pInputText id="password" type="password" formControlName="password" />
+        </div>
+        <div class="flex justify-end gap-2">
+            <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
+            <p-button label="Registrar Usuario" (click)="funGuardarUsuario()" />
+        </div>
+    </p-dialog>
+
+    <p-table [value]="usuarios" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template #header>
+            <tr>
+                <th>ID</th>
+                <th>NOMBRE</th>
+                <th>CORREO</th>
+                <th>CREADO EN</th>
+                <th>ACCION</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-usuario>
+            <tr>
+                <td>{{ usuario.id }}</td>
+                <td>{{ usuario.name }}</td>
+                <td>{{ usuario.email }}</td>
+                <td>{{ usuario.created_at }}</td>
+                <td></td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+</div>
+
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>NOMBRE</th>
+            <th>CORREO</th>
+            <th>CREADO EN</th>
+            <th>ACCION</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (user of usuarios; track $index) {
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.created_at }}</td>
+            <td>
+                <button>editar</button>
+                <button>eliminar</button>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
